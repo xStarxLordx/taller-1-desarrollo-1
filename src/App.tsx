@@ -2,6 +2,7 @@ import { useState } from 'react'
 import CharacterList from './components/CharacterList'
 import useCharacters  from './hooks/useCharacters'
 import styles from './App.module.css'
+import SearchBar from './components/SearchBar'
 
 function App() {
   const [query, setQuery] = useState('Rick')
@@ -39,6 +40,7 @@ function App() {
       </header>
 
       <main className={styles.main}>
+        <SearchBar value={query} onChange={setQuery} />
         {renderList()}
       </main>
 
