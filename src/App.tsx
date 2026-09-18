@@ -1,38 +1,39 @@
-import { useState } from 'react'
-import CharacterList from './components/CharacterList'
-import useCharacters  from './hooks/useCharacters'
-import styles from './App.module.css'
-import SearchBar from './components/SearchBar'
-import useDebouncedValue from './hooks/useDebouncedVaule'
-
+import { useState } from "react";
+import CharacterList from "./components/CharacterList";
+import useCharacters from "./hooks/useCharacters";
+import styles from "./App.module.css";
+import SearchBar from "./components/SearchBar";
+import useDebouncedValue from "./hooks/useDebouncedVaule";
+import CharacterDetails from "./components/CharacterDetails";
 
 function App() {
-  const [query, setQuery] = useState('Rick')
-  const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [page, setPage] = useState(1)
-  const debouncedQuery = useDebouncedValue(query, import.meta.env.SEARCH_DEBOUNCE)
-  const { characters, loading, error, isEmpty, totalPages } = useCharacters(debouncedQuery, page)
+  const [query, setQuery] = useState("Rick");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const debouncedQuery = useDebouncedValue(
+    query,
+    import.meta.env.SEARCH_DEBOUNCE,
+  );
+  const { characters, loading, error, isEmpty, totalPages } = useCharacters(
+    debouncedQuery,
+    page,
+  );
 
   function renderList() {
-    if (loading){
-      return <p>Cargando...</p>
+    if (loading) {
+      return <p>Cargando...</p>;
     }
     if (error) {
-      return <p>Error: {error}</p>
+      return <p>Error: {error}</p>;
     }
     if (isEmpty) {
-      return <p>No hay personajes que coincidan con tu búsqueda.</p>
+      return <p>No hay personajes que coincidan con tu búsqueda.</p>;
     }
-    return (
-      <CharacterList
-        characters={characters}
-        onSelect={setSelectedId}
-      />
-    )
+    return <CharacterList characters={characters} onSelect={setSelectedId} />;
   }
 
   return (
-    <div className= {styles.app}>
+    <div className={styles.app}>
       <header className={styles.header}>
         <div className={styles.headerInner}>
           <h1 className={styles.title}>
@@ -42,12 +43,20 @@ function App() {
       </header>
 
       <main className={styles.main}>
-        <SearchBar value={query} onChange={setQuery} />
-        {renderList()}
+        {selectedId === null ? (
+          <>
+            <SearchBar value={query} onChange={setQuery} />
+            {renderList()}
+          </>
+        ) : (
+          <CharacterDetails
+            id={selectedId}
+            onBack={() => setSelectedId(null)}
+          />
+        )}
       </main>
-
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
