@@ -5,9 +5,10 @@ import styles from "./App.module.css";
 import SearchBar from "./components/SearchBar";
 import useDebouncedValue from "./hooks/useDebouncedVaule";
 import CharacterDetails from "./components/CharacterDetails";
+import useFavorites from "./hooks/useFavorites";
 
 function App() {
-  const [query, setQuery] = useState("Rick");
+  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const debouncedQuery = useDebouncedValue(
@@ -19,6 +20,8 @@ function App() {
     page,
   );
 
+  const { favorites, toggleFavorite, isFavorite } = useFavorites();
+
   function renderList() {
     if (loading) {
       return <p>Cargando...</p>;
@@ -29,7 +32,7 @@ function App() {
     if (isEmpty) {
       return <p>No hay personajes que coincidan con tu búsqueda.</p>;
     }
-    return <CharacterList characters={characters} onSelect={setSelectedId} />;
+    return <CharacterList characters={characters} onSelect={setSelectedId} favorites={favorites} onToggleFavorite={toggleFavorite} />;
   }
 
   return (
@@ -52,6 +55,8 @@ function App() {
           <CharacterDetails
             id={selectedId}
             onBack={() => setSelectedId(null)}
+            isFavorite={isFavorite(selectedId)}
+            onToggleFavorite={toggleFavorite}
           />
         )}
       </main>
