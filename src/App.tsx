@@ -8,6 +8,7 @@ import CharacterDetails from "./components/CharacterDetails";
 import useFavorites from "./hooks/useFavorites";
 import FavoriteCounter from "./components/FavoriteCounter";
 import StatusMessage from "./components/StatusMessage";
+import Pagination from "./components/Pagination";
 
 function App() {
   const [query, setQuery] = useState("");
@@ -17,24 +18,50 @@ function App() {
     query,
     import.meta.env.SEARCH_DEBOUNCE,
   );
-  const { characters, loading, error, isEmpty, totalPages, retry } = useCharacters(
-    debouncedQuery,
-    page,
-  );
+  const { characters, loading, error, isEmpty, totalPages, retry } =
+    useCharacters(debouncedQuery, page);
 
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
+  const [pageQuery, setPageQuery] = useState(debouncedQuery);
+  
+  if(pageQuery !== debouncedQuery) {
+    setPageQuery(debouncedQuery);
+    setPage(1);
+  }
 
   function renderList() {
     if (loading) {
       return <StatusMessage type="loading" message="Cargando..." />;
     }
     if (error) {
-      return <StatusMessage type="error" message="Error al cargar los personajes."  onRetry={retry} />;
+      return (
+        <StatusMessage
+          type="error"
+          message="Error al cargar los personajes."
+          onRetry={retry}
+        />
+      );
     }
     if (isEmpty) {
-      return <StatusMessage type="empty" message="No hay personajes que coincidan con tu búsqueda." onRetry={retry}/>;
+      return (
+        <StatusMessage
+          type="empty"
+          message="No hay personajes que coincidan con tu búsqueda."
+          onRetry={retry}
+        />
+      );
     }
-    return <CharacterList characters={characters} onSelect={setSelectedId} favorites={favorites} onToggleFavorite={toggleFavorite} />;
+    return (
+      <>
+        <CharacterList
+          characters={characters}
+          onSelect={setSelectedId}
+          favorites={favorites}
+          onToggleFavorite={toggleFavorite}
+        />
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+      </>
+    );
   }
 
   return (
