@@ -6,6 +6,8 @@ import SearchBar from "./components/SearchBar";
 import useDebouncedValue from "./hooks/useDebouncedVaule";
 import CharacterDetails from "./components/CharacterDetails";
 import useFavorites from "./hooks/useFavorites";
+import FavoriteCounter from "./components/FavoriteCounter";
+import StatusMessage from "./components/StatusMessage";
 
 function App() {
   const [query, setQuery] = useState("");
@@ -15,7 +17,7 @@ function App() {
     query,
     import.meta.env.SEARCH_DEBOUNCE,
   );
-  const { characters, loading, error, isEmpty, totalPages } = useCharacters(
+  const { characters, loading, error, isEmpty, totalPages, retry } = useCharacters(
     debouncedQuery,
     page,
   );
@@ -24,13 +26,13 @@ function App() {
 
   function renderList() {
     if (loading) {
-      return <p>Cargando...</p>;
+      return <StatusMessage type="loading" message="Cargando..." />;
     }
     if (error) {
-      return <p>Error: {error}</p>;
+      return <StatusMessage type="error" message="Error al cargar los personajes."  onRetry={retry} />;
     }
     if (isEmpty) {
-      return <p>No hay personajes que coincidan con tu búsqueda.</p>;
+      return <StatusMessage type="empty" message="No hay personajes que coincidan con tu búsqueda." onRetry={retry}/>;
     }
     return <CharacterList characters={characters} onSelect={setSelectedId} favorites={favorites} onToggleFavorite={toggleFavorite} />;
   }
@@ -42,6 +44,7 @@ function App() {
           <h1 className={styles.title}>
             Rick <span className={styles.accent}> & </span> Morty
           </h1>
+          <FavoriteCounter count={favorites.length} />
         </div>
       </header>
 
